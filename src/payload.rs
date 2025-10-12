@@ -1,10 +1,32 @@
 use std::ops::Deref;
 
 use bytes::{Bytes, BytesMut};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 #[derive(Clone, Debug, Eq)]
 pub struct Payload {
     pub bytes: Bytes,
+}
+
+impl Serialize for Payload {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_bytes(&self.bytes)
+    }
+}
+
+impl<'de> Deserialize<'de> for Payload {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let bytes = <&[u8]>::deserialize(deserializer)?;
+        Ok(Payload {
+            bytes: Bytes::from(bytes.to_vec()),
+        })
+    }
 }
 impl PartialEq for Payload {
     #[inline]

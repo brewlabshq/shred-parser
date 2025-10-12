@@ -50,7 +50,7 @@ impl ShredFlags {
     }
 }
 // A common header that is present in data and code shred headers
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize, Serialize, SchemaWrite, SchemaRead)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct ShredCommonHeader {
     pub signature: Signature,
     pub shred_variant: ShredVariant,
@@ -61,11 +61,11 @@ pub struct ShredCommonHeader {
 }
 
 /// The data shred header has parent offset and flags
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize, Serialize, SchemaWrite, SchemaRead)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct DataShredHeader {
     pub parent_offset: u16,
-    pub flags: ShredFlags,
-    size: u16, // common shred header + data shred header + data
+    pub flags: u8, // ShredFlags convert
+    pub size: u16, // common shred header + data shred header + data
 }
 
 /// The coding shred header has FEC information
@@ -76,7 +76,7 @@ pub struct CodingShredHeader {
     pub position: u16, // [0..num_coding_shreds)
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub enum Shred {
     ShredCode(merkle::ShredCode),
     ShredData(merkle::ShredData),
