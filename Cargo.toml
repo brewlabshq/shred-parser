@@ -9,8 +9,6 @@ bitflags = {version = "2.10.0", features = ["serde"]}
 serde = { version = "1.0", features = ["derive"] }
 num_enum = "0.7.5"
 bytes = "1.8.0"
-solana-entry ={ git = "https://github.com/anza-xyz/agave" , features = ["agave-unstable-api"]}
-solana-ledger ={ git = "https://github.com/anza-xyz/agave" , features = ["agave-unstable-api"]}
 
 [dev-dependencies]
 serde_json = "1.0"

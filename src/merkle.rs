@@ -1,7 +1,6 @@
-use std::hash::Hash;
 
 use crate::{CodingShredHeader, DataShredHeader, ShredCommonHeader};
-use wincode::{containers::Pod, SchemaRead, SchemaWrite};
+use wincode::{SchemaRead, SchemaWrite};
 
 #[derive(Clone, Debug, SchemaRead, SchemaWrite)]
 pub struct ShredData {
