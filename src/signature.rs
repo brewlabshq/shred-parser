@@ -1,5 +1,3 @@
-use std::io::Error;
-
 use wincode::{SchemaRead, SchemaWrite};
 
 /// Number of bytes in a signature
