@@ -1,17 +1,19 @@
 
-use crate::{CodingShredHeader, DataShredHeader, ShredCommonHeader};
+use crate::{CodingShredHeader, DataShredHeader, ShredCommonHeader, payload::Payload};
 use wincode::{SchemaRead, SchemaWrite};
 
 #[derive(Clone, Debug, SchemaRead, SchemaWrite)]
 pub struct ShredData {
     pub common_header: ShredCommonHeader,
     pub data_header: DataShredHeader,
+    pub payload: Payload,
 }
 
 #[derive(Clone, Debug, SchemaRead, SchemaWrite)]
 pub struct ShredCode {
     pub common_header: ShredCommonHeader,
     pub coding_header: CodingShredHeader,
+    pub payload: Payload,
 }
 
 // #[derive(Debug, Default, PartialEq, Eq, Clone, SchemaWrite, SchemaRead)]
