@@ -15,9 +15,12 @@ pub mod payload;
 pub mod shred_code;
 pub mod signature;
 
+pub const SIZE_OF_SIGNATURE: usize = 64;
 pub const SIZE_OF_COMMON_SHRED_HEADER: usize = 83;
 pub const SIZE_OF_DATA_SHRED_HEADERS: usize = 88;
 pub const SIZE_OF_CODING_SHRED_HEADERS: usize = 89;
+pub const PACKET_DATA_SIZE: usize = 1232;
+pub const SIZE_OF_NONCE: usize = 4;
 
 pub const DATA_SHREDS_PER_FEC_BLOCK: usize = 32;
 pub const CODING_SHREDS_PER_FEC_BLOCK: usize = 32;
@@ -189,15 +192,39 @@ pub struct CodingShredHeader {
     pub position: u16, // [0..num_coding_shreds)
 }
 
-#[derive(Clone, Debug, SchemaRead, SchemaWrite)]
+#[derive(Clone, Debug)]
 pub enum Shred {
     ShredCode(merkle::ShredCode),
     ShredData(merkle::ShredData),
 }
 
-/// Parse a shred from raw bytes
-pub fn parse_shred(data: &[u8]) -> Result<Shred, wincode::ReadError> {
-    wincode::deserialize(data)
+pub mod layout {
+    use super::*;
+
+    /// Reads the shred variant byte at offset 64 (right after the signature).
+    pub fn get_shred_variant(shred: &[u8]) -> Result<ShredVariant, Error> {
+        let Some(&shred_variant) = shred.get(SIZE_OF_SIGNATURE) else {
+            return Err(Error::new(
+                ErrorKind::InvalidData,
+                "payload too small for shred variant",
+            ));
+        };
+        ShredVariant::try_from(shred_variant)
+    }
+}
+
+impl Shred {
+    /// Construct a Shred from raw serialized packet bytes.
+    pub fn new_from_serialized_shred(shred: Vec<u8>) -> Result<Self, Error> {
+        match layout::get_shred_variant(&shred)? {
+            ShredVariant::MerkleCode { .. } => {
+                Ok(Self::ShredCode(merkle::ShredCode::from_payload(shred)?))
+            }
+            ShredVariant::MerkleData { .. } => {
+                Ok(Self::ShredData(merkle::ShredData::from_payload(shred)?))
+            }
+        }
+    }
 }
 
 #[cfg(test)]
